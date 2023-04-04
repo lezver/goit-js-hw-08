@@ -28,7 +28,7 @@ const submitForm = e => {
 };
 refs.form.addEventListener('submit', submitForm);
 
-checkLocalStorage = () => {
+const checkLocalStorage = () => {
   const feedbackToObj = JSON.parse(localStorage.getItem('feedback-form-state'));
 
   const [email, message] = refs.form;
