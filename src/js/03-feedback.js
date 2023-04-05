@@ -1,40 +1,50 @@
 import throttle from 'lodash.throttle';
 
-const refs = {
-  form: document.querySelector('.feedback-form'),
-};
+const formRef = document.querySelector('.feedback-form');
 
-const obj = {};
+const [email, message] = formRef;
+
+const KEY = 'feedback-form-state';
+
+const checkLocalStorage = () => {
+  const objOfKey = JSON.parse(localStorage.getItem(KEY));
+
+  if (localStorage.getItem(KEY)) {
+    email.value = objOfKey.email;
+    message.value = objOfKey.message;
+  }
+};
 
 const checkInputForm = e => {
-  if (e.target.name === 'email') {
-    obj.email = e.target.value;
-  }
-  if (e.target.name === 'message') {
-    obj.message = e.target.value;
-  }
+  const {
+    target: { name, value },
+  } = e;
 
-  localStorage.setItem('feedback-form-state', JSON.stringify(obj));
+  if (name === 'email')
+    localStorage.setItem(
+      KEY,
+      JSON.stringify({ email: value, message: message.value })
+    );
+
+  if (name === 'message')
+    localStorage.setItem(
+      KEY,
+      JSON.stringify({ email: email.value, message: value })
+    );
 };
-
-refs.form.addEventListener('input', throttle(checkInputForm, 500));
 
 const submitForm = e => {
   e.preventDefault();
-  console.log(JSON.parse(localStorage.getItem('feedback-form-state')));
-  localStorage.removeItem('feedback-form-state');
 
   e.target.reset();
-};
-refs.form.addEventListener('submit', submitForm);
 
-const checkLocalStorage = () => {
-  const feedbackToObj = JSON.parse(localStorage.getItem('feedback-form-state'));
+  console.log(JSON.parse(localStorage.getItem(KEY)));
 
-  const [email, message] = refs.form;
-
-  if (feedbackToObj) email.value = feedbackToObj.email;
-  if (feedbackToObj) message.value = feedbackToObj.message;
+  localStorage.removeItem(KEY);
 };
 
 checkLocalStorage();
+
+formRef.addEventListener('input', throttle(checkInputForm, 500));
+
+formRef.addEventListener('submit', submitForm);
